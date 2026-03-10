@@ -3,7 +3,7 @@ package main
 import (
 	"akos_lab_4/internal/adapters/postgres"
 	"akos_lab_4/internal/app"
-	"akos_lab_4/internal/app/handlers"
+	"akos_lab_4/internal/app/controller"
 	"fmt"
 
 	"github.com/gin-gonic/gin"
@@ -46,7 +46,7 @@ func main() {
 
 	r := gin.Default()
 
-	contr := handlers.SetupRoutes(r)
+	contr := controller.SetupRoutes(r)
 
 	contr.Listen(":8080")
 

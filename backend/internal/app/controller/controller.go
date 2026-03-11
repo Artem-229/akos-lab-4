@@ -18,6 +18,18 @@ func SetupRoutes(r *gin.Engine, health_repo *handlers.HealthHandler, repo *handl
 		health_repo: *health_repo,
 		repo:        *repo,
 	}
+
+	r.Use(func(c *gin.Context) {
+		c.Header("Access-Control-Allow-Origin", "*")
+		c.Header("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS")
+		c.Header("Access-Control-Allow-Headers", "Content-Type")
+		if c.Request.Method == "OPTIONS" {
+			c.AbortWithStatus(204)
+			return
+		}
+		c.Next()
+	})
+
 	controller.g.GET("/health", health_repo.HealthCheck)
 	controller.g.POST("/addcontact", repo.NewUser)
 	controller.g.DELETE("/contacts/:id", repo.DeleteUser)

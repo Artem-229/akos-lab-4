@@ -46,7 +46,7 @@ func (r *ContactRepo) UpdateUser(phone models.Phone_info) error {
 }
 
 func (r *ContactRepo) GetPhone(id uuid.UUID) models.Phone_info {
-	query := `SELECT * FROM phones WHERE id=$1`
+	query := `SELECT id, fullname, phone_number, note FROM phones WHERE id=$1`
 
 	var ans models.Phone_info
 	_ = r.DB.QueryRow(query, id).Scan(&ans.ID, &ans.Name, &ans.Number, &ans.Note)
@@ -55,7 +55,7 @@ func (r *ContactRepo) GetPhone(id uuid.UUID) models.Phone_info {
 }
 
 func (r *ContactRepo) GetPhones() []models.Phone_info {
-	query := `SELECT * FROM phones`
+	query := `SELECT id, fullname AS name, phone_number AS number, note FROM phones`
 	var req []models.Phone_info
 
 	rows, _ := r.DB.Query(query)

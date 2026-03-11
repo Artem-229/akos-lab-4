@@ -28,10 +28,12 @@ func (r *ContactHandler) NewUser(c *gin.Context) {
 		})
 		return
 	}
+	contact.ID = uuid.New()
 	if err := PhoneValidator(contact); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{
 			"message": err.Error(),
 		})
+		return
 	}
 
 	err := r.Usecase.CreateUser(contact)
@@ -71,6 +73,7 @@ func (r *ContactHandler) UpdateUser(c *gin.Context) {
 		c.JSON(http.StatusBadRequest, gin.H{
 			"message": err.Error(),
 		})
+		return
 	}
 
 	if err := r.Usecase.UpdateUser(contact); err != nil {
@@ -88,6 +91,11 @@ func (r *ContactHandler) GetPhone(c *gin.Context) {
 		return
 	}
 	contact := r.Usecase.GetPhone(id)
+
+	if contact.ID == uuid.Nil {
+		c.JSON(http.StatusNotFound, gin.H{"message": "contact not found"})
+	}
+
 	c.JSON(http.StatusOK, contact)
 }
 

@@ -4,12 +4,14 @@ import (
 	"akos_lab_4/internal/adapters/postgres"
 	"akos_lab_4/internal/app"
 	"akos_lab_4/internal/app/controller"
+	"akos_lab_4/internal/app/handlers"
+	"akos_lab_4/internal/app/usecase"
 	"fmt"
 
 	"github.com/gin-gonic/gin"
 	"github.com/golang-migrate/migrate/v4"
 	_ "github.com/golang-migrate/migrate/v4/database/postgres"
-	_ "github.com/golang-migrate/migrate/v4/source/github"
+	_ "github.com/golang-migrate/migrate/v4/source/file"
 	"github.com/joho/godotenv"
 )
 
@@ -32,12 +34,14 @@ func main() {
 
 	db := postgres.MustConnectToDB(cfg)
 
-	_ = db
-
 	connstr := fmt.Sprintf("postgres://%s:%s@%s:%s/%s?sslmode=disable",
 		envinf.DB_USERNAME, envinf.DB_PASSWORD, envinf.DB_HOST, envinf.DB_PORT, envinf.DB_NAME)
 
 	m, err := migrate.New("file:///app/migrations", connstr)
+
+	if err != nil {
+		panic(err)
+	}
 
 	err = m.Up()
 	if err != nil {
@@ -46,7 +50,16 @@ func main() {
 
 	r := gin.Default()
 
-	contr := controller.SetupRoutes(r)
+	contactrepo := postgres.ContactRepo{
+		DB: db,
+	}
+
+	usecaserepo := usecase.NewContactUsecase(&contactrepo)
+
+	healthHandler := &handlers.HealthHandler{}
+	contactHandler := &handlers.ContactHandler{Usecase: usecaserepo}
+
+	contr := controller.SetupRoutes(r, healthHandler, contactHandler)
 
 	contr.Listen(":8080")
 

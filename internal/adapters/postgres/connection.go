@@ -18,7 +18,7 @@ type Config struct {
 } */
 
 func MustConnectToDB(cfg Config) *sql.DB {
-	connstr := fmt.Sprintf("host=%s port=%s user=%s dbname=%s password=%s",
+	connstr := fmt.Sprintf("host=%s port=%s user=%s dbname=%s password=%s sslmode=disable",
 		cfg.Host, cfg.Port, cfg.Username, cfg.DBname, cfg.Password)
 	db, err := sql.Open("postgres", connstr)
 	if err != nil {

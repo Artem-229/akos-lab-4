@@ -37,7 +37,7 @@ func (r *ContactRepo) DeleteUser(id uuid.UUID) error {
 func (r *ContactRepo) UpdateUser(phone models.Phone_info) error {
 	query := `UPDATE phones SET fullname=$1, phone_number=$2, note=$3 WHERE id=$4`
 
-	_, err := r.DB.Exec(query, phone.ID, phone.Name, phone.Number, phone.Note)
+	_, err := r.DB.Exec(query, phone.Name, phone.Number, phone.Note, phone.ID)
 	if err != nil {
 		return err
 	}

@@ -22,11 +22,16 @@ type ContactHandler struct {
 
 func (r *ContactHandler) NewUser(c *gin.Context) {
 	var contact models.Phone_info
-	if err := c.BindJSON(&contact); err != nil {
+	if err := c.ShouldBindJSON(&contact); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{
 			"message": "data problems",
 		})
 		return
+	}
+	if err := PhoneValidator(contact); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{
+			"message": err.Error(),
+		})
 	}
 
 	err := r.Usecase.CreateUser(contact)
@@ -58,10 +63,16 @@ func (r *ContactHandler) DeleteUser(c *gin.Context) {
 
 func (r *ContactHandler) UpdateUser(c *gin.Context) {
 	var contact models.Phone_info
-	if err := c.BindJSON(&contact); err != nil {
+	if err := c.ShouldBindJSON(&contact); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"message": "data problems"})
 		return
 	}
+	if err := PhoneValidator(contact); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{
+			"message": err.Error(),
+		})
+	}
+
 	if err := r.Usecase.UpdateUser(contact); err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"message": "error updating"})
 		return

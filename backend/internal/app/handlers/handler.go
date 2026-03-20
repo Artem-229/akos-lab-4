@@ -24,7 +24,7 @@ func (r *ContactHandler) NewUser(c *gin.Context) {
 	var contact models.Phone_info
 	if err := c.ShouldBindJSON(&contact); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{
-			"message": "data problems",
+			"message": "data parsing problems",
 		})
 		return
 	}
@@ -39,7 +39,7 @@ func (r *ContactHandler) NewUser(c *gin.Context) {
 	err := r.Usecase.CreateUser(contact)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{
-			"message": "problems with adding a contact",
+			"message": err.Error(),
 		})
 		return
 	}
@@ -66,7 +66,7 @@ func (r *ContactHandler) DeleteUser(c *gin.Context) {
 func (r *ContactHandler) UpdateUser(c *gin.Context) {
 	var contact models.Phone_info
 	if err := c.ShouldBindJSON(&contact); err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"message": "data problems"})
+		c.JSON(http.StatusBadRequest, gin.H{"message": "data parsing problems"})
 		return
 	}
 	if err := PhoneValidator(contact); err != nil {

@@ -2,6 +2,7 @@ package postgres
 
 import (
 	"akos_lab_4/internal/models"
+	"errors"
 
 	"database/sql"
 
@@ -17,7 +18,7 @@ func (r *ContactRepo) AddUser(phone models.Phone_info) error {
 			VALUES ($1, $2, $3, $4)`
 	_, err := r.DB.Exec(query, phone.ID, phone.Name, phone.Number, phone.Note)
 	if err != nil {
-		return err
+		return errors.New("The user already exists")
 	}
 
 	return nil

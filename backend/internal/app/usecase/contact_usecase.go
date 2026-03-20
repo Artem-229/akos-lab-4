@@ -11,7 +11,7 @@ type Handlerrepo interface {
 	DeleteUser(uuid.UUID) error
 	UpdateUser(models.Phone_info) error
 	GetPhone(uuid.UUID) models.Phone_info
-	GetPhones() []models.Phone_info
+	GetPhones() ([]models.Phone_info, error)
 }
 
 type ContactUsecase struct {
@@ -42,6 +42,6 @@ func (u *ContactUsecase) GetPhone(id uuid.UUID) models.Phone_info {
 	return u.repo.GetPhone(id)
 }
 
-func (u *ContactUsecase) GetPhones() []models.Phone_info {
+func (u *ContactUsecase) GetPhones() ([]models.Phone_info, error) {
 	return u.repo.GetPhones()
 }

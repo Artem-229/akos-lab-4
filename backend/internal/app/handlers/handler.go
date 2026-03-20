@@ -13,7 +13,7 @@ type ContactUseCase interface {
 	DeleteUser(uuid.UUID) error
 	UpdateUser(models.Phone_info) error
 	GetPhone(uuid.UUID) models.Phone_info
-	GetPhones() []models.Phone_info
+	GetPhones() ([]models.Phone_info, error)
 }
 
 type ContactHandler struct {
@@ -77,7 +77,11 @@ func (r *ContactHandler) UpdateUser(c *gin.Context) {
 	}
 
 	if err := r.Usecase.UpdateUser(contact); err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"message": "error updating"})
+		if err.Error() == "contact not found" {
+			c.JSON(http.StatusNotFound, gin.H{"message": "contact not found"})
+		} else {
+			c.JSON(http.StatusInternalServerError, gin.H{"message": "error updating"})
+		}
 		return
 	}
 	c.JSON(http.StatusOK, gin.H{"message": "updated"})
@@ -94,12 +98,17 @@ func (r *ContactHandler) GetPhone(c *gin.Context) {
 
 	if contact.ID == uuid.Nil {
 		c.JSON(http.StatusNotFound, gin.H{"message": "contact not found"})
+		return
 	}
 
 	c.JSON(http.StatusOK, contact)
 }
 
 func (r *ContactHandler) GetPhones(c *gin.Context) {
-	contacts := r.Usecase.GetPhones()
+	contacts, err := r.Usecase.GetPhones()
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"message": "could not get phones from database"})
+		return
+	}
 	c.JSON(http.StatusOK, contacts)
 }
